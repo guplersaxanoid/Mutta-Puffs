@@ -17,8 +17,15 @@ def getSchedule(filename: str):
         data = f.read()
         lines = data.split('\n')
         for l in lines:
-            s.append([int(x) for x in lines.split()])
-    return np.array(s)
+            s.append([int(x) for x in l.split()])
+    return np.array(s[:-1])
+
+def writeSchedule(S, filename):
+    with open(filename,'w') as f:
+        for x in S:
+            for y in x:
+                f.write(f"{y} ")
+            f.write("\n")
 
 def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
     numberOfTeams, numberOfRounds = S.shape
@@ -66,33 +73,7 @@ def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
 
         return newS 
 
-    def partialSwapRounds(S):
-        newS = np.copy(S) 
-        team = random.randint(0,numberOfTeams - 1)          
-        roundAindex = random.randint(0,numberOfRounds - 1)  
-        roundBindex = random.randint(0,numberOfRounds - 1)  
-                    
-        startCircuit = abs(S[team][roundAindex])
-        finishCircuit = abs(S[team][roundBindex])
-      
-        currentTeam = startCircuit
-        currentRound = roundBindex
-            
-        newS[team,[roundAindex,roundBindex]] =  newS[team,[roundBindex,roundAindex]]
-                    
-        while currentTeam != finishCircuit:
-                        
-            index = currentTeam - 1        
-            newS[index,[roundAindex,roundBindex]] =  newS[index,[roundBindex,roundAindex]]            
-            currentTeam = abs(S[currentTeam - 1][currentRound])
-            if currentRound == roundBindex:
-                currentRound = roundAindex
-            else:
-                currentRound = roundBindex    
-            index = currentTeam - 1        
-            newS[index,[roundAindex,roundBindex]] =  newS[index,[roundBindex,roundAindex]]
-
-        return newS 
+    #todo: implement partialSwapRounds
 
     def partialSwapTeams(S):
         newS = np.copy(S)
@@ -149,6 +130,7 @@ def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
                     newS[affectedTeamB - 1][i] = abs(oppositeA)
                 else:                
                     newS[affectedTeamB - 1][i] = - abs(oppositeA)
+        return newS
 
     for i in range(numberOfTeams):
         count = 0
@@ -190,7 +172,7 @@ def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
         while phase<=maxP:
             counter = 0
             while counter <= maxC:
-                chooseMove = random.randint(0,4)
+                chooseMove = random.randint(0,3)
 
                 if chooseMove == 0:
                     newS = swapHomes(S)
@@ -198,11 +180,11 @@ def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
                     newS = swapRounds(S)
                 elif chooseMove == 2:
                     newS = swapTeams(S)
+                #elif chooseMove == 3:
+                #    newS = partialSwapRounds(S)
                 elif chooseMove == 3:
-                    newS = partialSwapRounds(S)
-                elif chooseMove == 4:
                     newS = partialSwapTeams(S)
-
+                #print(newS)
                 numberOfViolations = 0
                 for i in range(numberOfTeams):
                     count = 0
@@ -280,21 +262,23 @@ def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
         reheat += 1   
         T = 2*bestTemperature
 
-    return S
+    return S, costS
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file',required=True)
-    parser.add_argument('--dfile',required=True)
+    parser.add_argument('--process',type=int,required=True)
     parser.add_argument('--temp',type=float,default=400)
-    parser.add_argument('-p',type=int,default=1250)
-    parser.add_argument('-c',type=int,default=1000)
-    parser.add_argument('-r',type=int,default=10)
+    parser.add_argument('-p',type=int,default=12)
+    parser.add_argument('-c',type=int,default=10)
+    parser.add_argument('-r',type=int,default=2)
     parser.add_argument('-b',type=float,default=0.999)
     parser.add_argument('-w',type=float,default=4000)
     parser.add_argument('--teta',type=float,default=1.04)   
     args = parser.parse_args()
 
-    S = getSchedule(args.file)
-    dist = getDistances(args.dfile)
-    S = SA(S,dist,args.temp,args.p,args.c,args.r,args.b,args.w,args.teta)
+    S = getSchedule("schedule.txt")
+    dist = getDistances("distances.txt")
+    S, costS = SA(S,dist,args.temp,args.p,args.c,args.r,args.b,args.w,args.teta)
+    writeSchedule(S,f"schedule_{args.process}.txt")
+    with open(f"cost_{args.process}.txt","w") as f:
+        f.write(str(costS))
