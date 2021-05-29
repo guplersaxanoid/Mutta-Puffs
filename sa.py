@@ -29,6 +29,7 @@ def writeSchedule(S, filename):
 
 def SA(S,dist,T,maxP,maxC,maxR,beta,weight,teta):
     numberOfTeams, numberOfRounds = S.shape
+    print(S.shape)
     numberOfViolations = 0
 
     def swapHomes(S):
