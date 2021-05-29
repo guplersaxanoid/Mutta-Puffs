@@ -1,5 +1,5 @@
-from itertools import count
 import numpy as np
+import json 
 
 TEXT_COLOR_RED = "\033[31;1m"
 TEXT_COLOR_GREEN = "\033[32;1m"
@@ -126,3 +126,30 @@ def update_schedule(numberOfWorkers):
     cost_dict = sort_costs(get_costs(numberOfWorkers))
     for i in range(3):
         copy(f"input/s{i}.txt",f"output/schedules/schedule_{list(cost_dict.keys())[0]}.txt")
+
+def process_user_input(data):
+    data = json.loads(data)
+    locs = []
+    with open("input/teams.txt","w") as f:
+        for team in data:
+            f.write(f"{team['name']}:{team['abbr']}\n")
+            locs.append(tuple([float(x) for x in team["location"].split(',')]))
+    with open("input/distances.txt","w") as f:
+        for i in range(len(locs)):
+            for j in range(len(locs)):
+                if i==j:
+                    f.write("0 ")
+                else:
+                    f.write(f"{distance_calculator(locs[i],locs[j])} ")
+            f.write("\n")
+
+
+def distance_calculator(loc1,loc2):
+    R = 6371
+    p1 = loc1[0]*np.pi/180
+    p2 = loc2[0]*np.pi/180
+    dp = (loc2[0]-loc1[0])*np.pi/180
+    dl = (loc2[1]-loc1[0])*np.pi/180
+    a = np.sin(dp/2)**2 + np.cos(p1)*np.cos(p2) + np.sin(dl/2)**2
+    c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))
+    return c; #distance without scaling to radius of earth     
