@@ -1,15 +1,15 @@
 import asyncio 
 from datetime import datetime, timedelta
-from os import scandir
 import pathlib 
 import sys
-from numpy.core.records import array 
-import argparse
-
+from constants import * 
+import dataframe_image as dfi
+from output_processor import generate_schedule_table
 from yapapi import Executor, NoPaymentAccountError, Task, WorkContext, windows_event_loop_fix
 from yapapi import package 
 from yapapi.log import enable_default_logger, log_summary, log_event_repr 
 from yapapi.package import vm 
+
 from utils import (
     generate_schedule, 
     update_schedule,
@@ -23,7 +23,7 @@ from utils import (
 base = pathlib.Path(__file__).resolve().parent
 sys.path.append(str(base))
 
-async def main(workers, waves):
+async def main():
     package = await vm.repo(
         image_hash="3edcb8953b432e6e653b49bd6323e0a93fd901db4c79ef3b13401aa2", #todo: update image hash
         min_mem_gib=0.5,
@@ -43,42 +43,41 @@ async def main(workers, waves):
             yield ctx.commit(timeout=timedelta(minutes=10))
             task.accept_result()
             
-    generate_schedule()
-    schedules = ["input/s0.txt"]*workers
+    schedules = ["input/s0.txt"]*NUM_PROVIDERS
 
-    for wave in range(1,waves+1):
+    for wave in range(1,NUM_WAVES+1):
         async with Executor(
             package=package,
-            max_workers=workers,
-            budget=10.0, #todo: set budget
+            max_workers=NUM_PROVIDERS,
+            budget=BUDGET, #todo: set budget
             timeout=timedelta(minutes=10), #todo: set timeout
-            driver='zksync',
-            network='rinkeby',
+            driver="zksync",
+            network="rinkeby",
             subnet_tag="devnet-beta.1",
             event_consumer=log_summary(log_event_repr), 
         ) as executor:
 
-            tasks = [Task(data=num) for num in range(workers)]
+            tasks = [Task(data=num) for num in range(NUM_PROVIDERS)]
             async for task in executor.submit(worker_find_schedule,tasks):
                 print(f"worker {task.data} completed its wave {wave}")
-            update_schedule(workers)
-            schedules=["input/s0.txt"]*(workers-2)
-            schedules.append("input/s1.txt")
-            schedules.append("input/s2.txt")
+        update_schedule(NUM_PROVIDERS)
+        schedules=["input/s0.txt"]*(NUM_PROVIDERS-2)
+        schedules.append("input/s1.txt")
+        schedules.append("input/s2.txt")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--workers", default=10, type=int)
-    parser.add_argument("--waves", default=3, type=int)
-    args = parser.parse_args()
-
-    enable_default_logger(log_file="log.txt")
     
+    enable_default_logger(log_file="log.txt")
+    generate_schedule()
+    SCHEDULE_SAVED = False
     loop = asyncio.get_event_loop()
-    task = loop.create_task(main(args.workers, args.waves))
+    task = loop.create_task(main())
 
     try:
         loop.run_until_complete(task)
+        S = generate_schedule_table()
+        dfi.export(S,'schedule.png')
+        SCHEDULE_SAVED = True
     except NoPaymentAccountError as e:
         print(
             f"{TEXT_COLOR_RED}",
