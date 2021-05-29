@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="mapstyle.css"/>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+           integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+           crossorigin=""/>
+           <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.1.0/dist/geosearch.css"/>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <div class="wrapper" style="height: 50%; width: 100%;">
+            <div class="card" id="add-team-card" style="width: 30%; margin: 20px; position: relative; left:5%; border-radius: 5px;">
+                <form style="height: 80%; width: 100%; position:relative; top: 10%; left: 5%" name="team-info-input" class="team-info-input">
+                    <div class="team-input" style="height:10%; width:100%;">
+                        <label style="font-size: 25px; margin: 5px">Team Name</label>
+                        <input  required type="text" name="team-name" style="border: black 5px solid; border-radius: 2px; margin: 5px; padding: 5px; font-size: 22px;">
+                    </div>
+                    <div style="margin: 5px;">
+                        <label for="abbr" style="font-size: 60px; margin: 5px">Abbreviation</label>
+                        <input required style="border: black 5px solid; border-radius: 2px; margin: 5px; padding: 5px;font-size: 24px;" name="abbr" maxlength="3" size="3">
+                    </div>  
+                    <div style="height: 60%; width: 90%; border: gray 2px solid; margin-top: 10px;"></div>            
+                    <div style="position: relative; top: -67%; left: 2%; background-color: white; width: fit-content;">
+                        <p style="font-size: 20px; align-content: center;">Location of the home stadium</p>
+                    </div>  
+                    <div id="validation-message" style="color: red;"></div>
+                </form>
+                <div style="text-align: center; position: relative; top: 5%;">
+                    <input type="submit" value="+ Add Team" id="team-info-submit" onclick="addTeam()">
+                </div>
+            </div>
+            <div style="margin:10px; height: 45%; width:25%; position: relative;top: 45%; right: 21%;">
+                <div id="map" style="width: 100%;"></div>    
+            </div>
+            <div id="team-list">
+                <button id="undo-button" onclick="removeTeam()">
+                    <i class="fa fa-undo" style="font-size: 36px; color: white"></i>
+                </button>
+            </div>
+            <div style="width: 20%; height: 10%;color:white;font-size: 50px; background-color: rgb(6,146,25); position: relative; top:5%; right: 45%; text-align: center;">
+                Team List
+            </div>
+        </div>
+        <div id="gen-schedule-button-wrapper" style="width:fit-content; position: absolute; top:52%; right: 25%;">
+            <input type="submit" id="gen-schedule-button" value="generate schedule" onclick="writeInputs()">
+        </div>
+        <div id="app-info" style="border: 10px rgb(6,146,25) solid; border-radius: 10px; width: 80%; height: 30%; position: absolute; left: 10%; top: 70%">
+            <div style="background-color: white; font-size: 50px;position: relative;top: -13%;left:2%; width: fit-content; color: rgb(6,146,25)">
+                Mutta Puffs
+            </div>
+            <div style="font-size: 30px; margin: 10px">
+                Mutta Puffs is a sports league scheduler that automates the scheduling process parallely on multiple computers in Golem network. 
+                In the input boxes above, provide the names, abbreviations and home stadium locations of the teams participating in the league.
+                Round-Robin leagues require even number of  in order to play every team in each round so, Mutta Puffs expects even number of 
+                teams in your list. And there has to be atleast 4 teams inorder to justify the need for automation of the scheduling process.
+            </div>
+        </div>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script> 
+        <script src="https://unpkg.com/leaflet-geosearch@3.1.0/dist/bundle.min.js"></script> 
+        <script src="https://code.jquery.com/jquery-3.1.1.min.js" 
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+        <script src="mapscript.js"></script>
+    </body>
+</html> 
