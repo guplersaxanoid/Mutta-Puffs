@@ -243,7 +243,6 @@ class SettingsWindow(QtWidgets.QWidget):
         NETWORK = str(self.network_box.currentText())
         DRIVER = str(self.driver_box.currentText())
         SUBNET_TAG = str(self.subnet_box.text())
-        print(NETWORK, SUBNET_TAG)
         self.close()
 
         
