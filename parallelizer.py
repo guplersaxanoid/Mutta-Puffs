@@ -51,9 +51,9 @@ async def main():
             max_workers=NUM_PROVIDERS,
             budget=BUDGET, #todo: set budget
             timeout=timedelta(minutes=10), #todo: set timeout
-            driver="zksync",
-            network="rinkeby",
-            subnet_tag="devnet-beta.1",
+            driver=DRIVER,
+            network=NETWORK,
+            subnet_tag=SUBNET_TAG,
             event_consumer=log_summary(log_event_repr), 
         ) as executor:
 
