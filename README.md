@@ -52,7 +52,7 @@ You may interact with this screen in three ways:
 
 1.) Compute:
 
-The compute button in the bottom right corner runs the parallelizer.py program which connects with  required number of providers and sends them sa.py file along with an initial random schedule contained in the file schedule.txt
+The compute button in the bottom left corner runs the parallelizer.py program which connects with  required number of providers and sends them sa.py file along with an initial random schedule contained in the file schedule.txt
 
 2.) settings:
 
