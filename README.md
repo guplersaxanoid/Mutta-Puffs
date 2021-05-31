@@ -21,6 +21,8 @@ gvmkit-build muttapuffs:latest --push
 
 2.) run yagna daemon, set YAGNA_APPKEY environment variable and intitialize a payment account by following the instruction in this primer: https://handbook.golem.network/requestor-tutorials/flash-tutorial-of-requestor-development
 
+3.) Install required packages: `pip install -r requirements.txt`
+
 Now you are ready to talk to Mutta Puffs.
 
 ## Adding Teams
