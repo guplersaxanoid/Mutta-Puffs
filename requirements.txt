@@ -1,0 +1,5 @@
+dataframe_image==0.1.1
+numpy==1.19.5
+pandas==1.0.5
+PyQt5==5.15.4
+yapapi==0.5.5
